@@ -1,19 +1,13 @@
 const express = require('express');
+const { getOrders, getOrderById, createOrder, updateOrder, completeOrder } = require('../controllers/ordersController');
+const authenticateToken = require('../middleware/authenticateToken');
+
 const router = express.Router();
-const {
-  getOrders,
-  getOrder,
-  createOrder,
-  updateOrder,
-  deleteOrder,
-  completeOrder
-} = require('../controllers/ordersController');
 
 router.get('/', getOrders);
-router.get('/:orderId', getOrder);
+router.get('/:orderId', getOrderById);
 router.post('/', createOrder);
 router.put('/:orderId', updateOrder);
-router.delete('/:orderId', deleteOrder);
-router.post('/:orderId/complete', completeOrder);
+router.post('/:orderId/complete', authenticateToken, completeOrder);
 
 module.exports = router;

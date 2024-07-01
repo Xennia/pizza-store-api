@@ -3,23 +3,23 @@
 
 ```http
 ### Create Order
-POST http://localhost:3000/api/orders
+POST http://localhost:3002/api/orders
 Content-Type: application/json
 
 {
-  "size": "medium",
+  "size": "large",
   "toppings": ["cheese", "pepperoni"],
-  "quantity": 1
+  "quantity": 3
 }
 
 ### Get All Orders
-GET http://localhost:3000/api/orders
+GET http://localhost:3002/api/orders
 
 ### Get Order
-GET http://localhost:3000/api/orders/{orderId}
+GET http://localhost:3002/api/orders/1dc155e2-89db-4725-803a-7120b67adc8c
 
 ### Update Order
-PUT http://localhost:3000/api/orders/{orderId}
+PUT http://localhost:3002/api/orders/{orderId}
 Content-Type: application/json
 
 {
@@ -29,7 +29,7 @@ Content-Type: application/json
 }
 
 ### Delete Order
-DELETE http://localhost:3000/api/orders/{orderId}
+DELETE http://localhost:3002/api/orders/{orderId}
 
 ### Complete Order
-POST http://localhost:3000/api/orders/{orderId}/complete
+POST http://localhost:3002/api/orders/{orderId}/complete

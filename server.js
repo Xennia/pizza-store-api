@@ -1,16 +1,20 @@
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
-const ordersRouter = require('./routes/orders');
+const orderRoutes = require('./routes/orders');
+const authRoutes = require('./routes/auth');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
-const PORT = 3002;
+const port = 3002;
 
 app.use(bodyParser.json());
-app.use('/api/orders', ordersRouter);
+app.use('/api/orders', orderRoutes);
+app.use('/api/auth', authRoutes);
+
+// Error handling middleware
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
-

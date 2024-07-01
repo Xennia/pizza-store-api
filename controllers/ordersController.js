@@ -1,46 +1,102 @@
-const uuid = require('uuid');
-const orders = [];
+const { orders } = require('../models/order');
+const { body, validationResult } = require('express-validator');
 
-exports.getOrders = (req, res) => {
+const getOrders = (req, res) => {
   res.json(orders);
 };
 
-exports.getOrder = (req, res) => {
-  const order = orders.find(o => o.id === req.params.orderId);
-  if (!order) return res.status(404).json({ error: 'Order not found' });
+const getOrderById = (req, res) => {
+  const { orderId } = req.params;
+  const order = orders.find(o => o.id === orderId);
+  if (!order) {
+    return res.status(404).json({ error: 'Order not found' });
+  }
   res.json(order);
 };
 
-exports.createOrder = (req, res) => {
-  const { size, toppings, quantity } = req.body;
-  const newOrder = { id: uuid.v4(), size, toppings, quantity, status: 'pending' };
-  orders.push(newOrder);
-  res.status(201).json(newOrder);
-};
+const createOrder = [
+  body('size').isIn(['small', 'medium', 'large']).withMessage('Invalid size'),
+  body('toppings').isArray().withMessage('Toppings should be an array'),
+  body('quantity').isInt({ min: 1 }).withMessage('Quantity should be a positive integer'),
+  (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
-exports.updateOrder = (req, res) => {
-  const order = orders.find(o => o.id === req.params.orderId);
-  if (!order) return res.status(404).json({ error: 'Order not found' });
+    const { size, toppings, quantity } = req.body;
+    const newOrder = {
+      id: uuidv4(),
+      size,
+      toppings,
+      quantity,
+      status: 'pending'
+    };
+    orders.push(newOrder);
+    res.status(201).json(newOrder);
+  }
+];
 
-  const { size, toppings, quantity } = req.body;
-  order.size = size || order.size;
-  order.toppings = toppings || order.toppings;
-  order.quantity = quantity || order.quantity;
-  res.json(order);
-};
+const updateOrder = [
+  body('size').isIn(['small', 'medium', 'large']).withMessage('Invalid size'),
+  body('toppings').isArray().withMessage('Toppings should be an array'),
+  body('quantity').isInt({ min: 1 }).withMessage('Quantity should be a positive integer'),
+  (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
-exports.deleteOrder = (req, res) => {
-  const orderIndex = orders.findIndex(o => o.id === req.params.orderId);
-  if (orderIndex === -1) return res.status(404).json({ error: 'Order not found' });
-  
+    const { orderId } = req.params;
+    const { size, toppings, quantity } = req.body;
+
+    const order = orders.find(o => o.id === orderId);
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    order.size = size;
+    order.toppings = toppings;
+    order.quantity = quantity;
+
+    res.json(order);
+  }
+];
+
+const completeOrder = (req, res) => {
+  const { orderId } = req.params;
+
+  const orderIndex = orders.findIndex(o => o.id === orderId);
+  if (orderIndex === -1) {
+    return res.status(404).json({ error: 'Order not found' });
+  }
+
+  const order = orders[orderIndex];
+
+  // Calculate total price (this is a simple example, you can adjust as needed)
+  const basePrice = pricePerSize[order.size] || 0;
+  const toppingPrice = order.toppings.length * 2;
+  const totalPrice = basePrice + toppingPrice * order.quantity;
+
+  // Simulate order completion by removing from the in-memory store
   orders.splice(orderIndex, 1);
-  res.status(204).end();
+
+  // Return order summary
+  res.json({
+    id: order.id,
+    size: order.size,
+    toppings: order.toppings,
+    quantity: order.quantity,
+    totalPrice: totalPrice,
+    status: 'completed'
+  });
 };
 
-exports.completeOrder = (req, res) => {
-  const order = orders.find(o => o.id === req.params.orderId);
-  if (!order) return res.status(404).json({ error: 'Order not found' });
-
-  order.status = 'completed';
-  res.json(order);
+module.exports = {
+  getOrders,
+  getOrderById,
+  createOrder,
+  updateOrder,
+  completeOrder
 };
+
