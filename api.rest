@@ -1,0 +1,35 @@
+
+**tests/api.rest**: Test cases for the API.
+
+```http
+### Create Order
+POST http://localhost:3000/api/orders
+Content-Type: application/json
+
+{
+  "size": "medium",
+  "toppings": ["cheese", "pepperoni"],
+  "quantity": 1
+}
+
+### Get All Orders
+GET http://localhost:3000/api/orders
+
+### Get Order
+GET http://localhost:3000/api/orders/{orderId}
+
+### Update Order
+PUT http://localhost:3000/api/orders/{orderId}
+Content-Type: application/json
+
+{
+  "size": "large",
+  "toppings": ["cheese", "pepperoni", "mushrooms"],
+  "quantity": 2
+}
+
+### Delete Order
+DELETE http://localhost:3000/api/orders/{orderId}
+
+### Complete Order
+POST http://localhost:3000/api/orders/{orderId}/complete
